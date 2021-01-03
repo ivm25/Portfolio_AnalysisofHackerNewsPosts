@@ -7,9 +7,9 @@
 # ***
 # **Analyse Hacker News posts to understand which is the best time to have more comments on posts.**
 # 
-# **Assumptions: The dataset is assumed to largely clean. The source of data is Hacker news source on Kaggle.**
+# **Assumptions: The dataset is assumed to largely clean. The source of data is Hacker news source on the source website.**
 
-# In[2]:
+# In[7]:
 
 
 from csv import reader
@@ -18,14 +18,14 @@ read_file = reader(opened_file)
 hn = list(read_file)
 
 
-# In[3]:
+# In[8]:
 
 
 #Print the first six rows to understand how the data looks and if we have the correct data or not.
 print(hn[0:6])
 
 
-# In[4]:
+# In[9]:
 
 
 #print only the headers of the file
@@ -33,14 +33,14 @@ headers=hn[0]
 print(headers)
 
 
-# In[4]:
+# In[10]:
 
 
 # Store the data without the headers in a new variable
 hn=hn[1:]
 
 
-# In[5]:
+# In[11]:
 
 
 print(hn[0:5])
@@ -48,7 +48,7 @@ print(hn[0:5])
 
 # ### Analysis of ask_posts, show posts and other posts
 
-# In[6]:
+# In[12]:
 
 
 #creating empty lists to store ask_posts, show_posts and other_posts
@@ -68,25 +68,25 @@ for row in hn:
         
 
 
-# In[7]:
+# In[13]:
 
 
 print(len(show_posts))
 
 
-# In[8]:
+# In[14]:
 
 
 print(len(ask_posts))
 
 
-# In[9]:
+# In[15]:
 
 
 print(ask_posts[0:4])
 
 
-# In[10]:
+# In[16]:
 
 
 print(show_posts[0:4])
@@ -94,7 +94,7 @@ print(show_posts[0:4])
 
 # **Now that we have ask posts and show posts in different lists, we will analyse the average comments per posts for both and hypothesize a reason for the differences**
 
-# In[11]:
+# In[17]:
 
 
 # Computing the average comments on ask posts
@@ -111,7 +111,7 @@ avg_ask_comments=total_ask_comments/len(ask_posts)
 print(avg_ask_comments)
 
 
-# In[12]:
+# In[18]:
 
 
 # Computing the average comments on show posts
@@ -140,7 +140,7 @@ print(avg_show_comments)
 # 3. Calculate **average number of comments ask posts recieved every hour** to understand what is the best time to post/comment on ask posts
 # 
 
-# In[13]:
+# In[19]:
 
 
 # initiating a new, empty list to store date,time and the number of posts created during that time
@@ -153,7 +153,7 @@ for post in ask_posts:
     )
 
 
-# In[14]:
+# In[20]:
 
 
 print(result_list)
@@ -161,7 +161,7 @@ print(result_list)
 
 # ### As the output in the list looks correct, we will start to segregate the list by timing of the comments and create sepearate dictionaries for counts by hour and comments by hour 
 
-# In[17]:
+# In[21]:
 
 
 import datetime as dt
@@ -190,7 +190,7 @@ for each_row in result_list:
 print(counts_by_hour)
 
 
-# In[18]:
+# In[22]:
 
 
 print(comments_by_hour)
@@ -198,7 +198,7 @@ print(comments_by_hour)
 
 # **Creating a list of lists to calculate the average number of comments per post created during each hour of the day.**
 
-# In[25]:
+# In[23]:
 
 
 average_comms_per_hour=[]
@@ -210,7 +210,7 @@ for comms in comments_by_hour:
     avg_by_hour=average_comms_per_hour
 
 
-# In[26]:
+# In[24]:
 
 
 # perform a sanity check on the new variable "avg_by_hour"
@@ -219,7 +219,7 @@ avg_by_hour
 
 # **Sort the above list by average comments and then by the hour.Print the five top values to make it easier to read**
 
-# In[28]:
+# In[25]:
 
 
 swap_avg_by_hour=[]
@@ -229,7 +229,7 @@ for row in avg_by_hour:
 print(swap_avg_by_hour)
 
 
-# In[32]:
+# In[26]:
 
 
 # Sort the list by the highest number of comments by hour
@@ -237,7 +237,7 @@ print(swap_avg_by_hour)
 sorted_swap=sorted(swap_avg_by_hour,reverse=True)
 
 
-# In[33]:
+# In[27]:
 
 
 print(sorted_swap)
@@ -245,7 +245,7 @@ print(sorted_swap)
 
 # *Printing top 5 hours to ask posts comments*
 
-# In[34]:
+# In[28]:
 
 
 print(sorted_swap[0:5])
@@ -253,9 +253,10 @@ print(sorted_swap[0:5])
 
 # **Print out the summary of sorted list of average comments/hour/post**
 
-# In[47]:
+# In[29]:
 
 
+summary = []
 for row in sorted_swap[0:5]:
     time=dt.datetime.strptime(row[1],"%H").strftime("%H:00")
     print(time)
@@ -263,9 +264,72 @@ for row in sorted_swap[0:5]:
     #create a variable using (.format()) to save the variable    
     output="{h}:{a:.2f} average comments per post".format(h=time,a=average)
     print(output)
+    summary.append(output)
     
+
+
+# In[30]:
+
+
+type(output)
 
 
 # ### Conclusion
 # 
 # *The above analysis demonstrates that posts around 15:00 hours on an average have a higher chance of recieving comments.*
+
+# In[31]:
+
+
+from pptx import Presentation
+from pptx.util import Inches,Cm, Pt
+from pptx.dml.color import RGBColor
+from pptx.enum.shapes import MSO_SHAPE
+
+
+# In[44]:
+
+
+def create_summary(lst):
+    prs=Presentation()
+    im_slide=prs.slides.add_slide(prs.slide_layouts[0])
+    title_slide_layout=prs.slide_layouts[0]
+    slide=im_slide
+                                  
+    placeholder=0
+    left=1
+    top=1
+    width=1
+    height=0.5
+    for row in lst:
+        if placeholder==16:
+            slide=prs.slides.add_slide(prs.slide_layouts[0])
+            placeholder = 0
+            left = 1
+            top = 2.5
+        if placeholder == 8 or placeholder == 16:
+            left = left + 4.5
+            top = 2.5
+        
+                                  
+        textBox = slide.shapes.add_textbox(Inches(left),Inches(top),Inches(width),Inches(height))
+        shape = slide.shapes.add_shape(MSO_SHAPE.ROUNDED_RECTANGLE, Inches(left), Inches(top), Inches(width), Inches(height))
+        tf = shape.text_frame
+        p = tf.paragraphs[0]
+        run = p.add_run()
+        run.text = row
+        run.font.name = "Arial"
+        run.font.size = Pt(7)
+        
+                                  
+        placeholder = placeholder + 1
+                                  
+        top = top + 0.5
+    prs.save('Summary.pptx')
+
+
+# In[45]:
+
+
+create_summary(summary)
+
